@@ -323,13 +323,13 @@ main (int argc, char *argv[])
   StringValue stringValue;
   DoubleValue doubleValue;
   //EnumValue enumValue;
-  GlobalValue::GetValueByName("numBlocks", uintegerValue);
+  /*GlobalValue::GetValueByName("numBlocks", uintegerValue);
   uint32_t numBlocks = uintegerValue.Get();
   GlobalValue::GetValueByName("maxXAxis", doubleValue);
   double maxXAxis = doubleValue.Get();
   GlobalValue::GetValueByName("maxYAxis", doubleValue);
   double maxYAxis = doubleValue.Get();
-
+*/
   // Variables for the RT 
   int windowForTransient = 150; // number of samples for the vector to use in the filter
   GlobalValue::GetValueByName("reportTablePeriodicity", uintegerValue);
@@ -536,7 +536,7 @@ main (int argc, char *argv[])
 
 // create LTE, mmWave eNB nodes and UE node
   NodeContainer ueNodes;
-  Ns2MobilityHelper ns2 = Ns2MobilityHelper("/home/luca/Scrivania/TLCnet_prj/crossroad/ns3/traces/mobility.tcl");
+  Ns2MobilityHelper ns2 = Ns2MobilityHelper("../../crossroad/ns3/traces/mobility.tcl");
 
   ueNodes.Create(12);
   
@@ -598,18 +598,28 @@ main (int argc, char *argv[])
 
   std::vector<Ptr<Building> > buildingVector;
 
-  double maxBuildingSize = 20;
+  //double maxBuildingSize = 20;
 
-  for(uint32_t buildingIndex = 0; buildingIndex < numBlocks; buildingIndex++)
+  Ptr < Building > buildingRight;
+  buildingRight = Create<Building> ();//(52.5,17.5,5,35,0,10);
+  buildingRight->SetBoundaries (Box (52.5, 17.5, 5, 35, 0, 10));
+
+  buildingVector.push_back(buildingRight);
+
+  Ptr < Building > buildingLeft;
+  buildingLeft = Create<Building> (); // (27.5,45,5,35,0,10);
+  buildingRight->SetBoundaries (Box (27.5,45,5,35,0,10));
+  buildingVector.push_back(buildingLeft);
+
+ /* for(uint32_t buildingIndex = 0; buildingIndex < numBlocks; buildingIndex++)
   {
     Ptr < Building > building;
       building = Create<Building> ();
-      /*returns a vector where:
+      *returns a vector where:
       * position [0]: coordinates for x min
       * position [1]: coordinates for x max
       * position [2]: coordinates for y min
       * position [3]: coordinates for y max
-      */
       std::pair<Box, std::list<Box>> pairBuildings = GenerateBuildingBounds(maxXAxis, maxYAxis, maxBuildingSize, m_previousBlocks);
       m_previousBlocks = std::get<1>(pairBuildings);
       Box box = std::get<0>(pairBuildings);
@@ -623,7 +633,7 @@ main (int argc, char *argv[])
                                     0.0, buildingHeight));
       buildingVector.push_back(building);
   }
-
+*/
 
   //Install Mobility Model
   Ptr<ListPositionAllocator> enbPositionAlloc = CreateObject<ListPositionAllocator> ();
