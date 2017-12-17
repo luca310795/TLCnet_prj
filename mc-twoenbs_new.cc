@@ -196,7 +196,7 @@ static ns3::GlobalValue g_handoverMode("handoverMode",
     "Handover mode",
     ns3::UintegerValue(3), ns3::MakeUintegerChecker<uint8_t>());
 static ns3::GlobalValue g_reportTablePeriodicity("reportTablePeriodicity", "Periodicity of RTs",
-    ns3::UintegerValue(1600), ns3::MakeUintegerChecker<uint32_t>());
+    ns3::UintegerValue(25600), ns3::MakeUintegerChecker<uint32_t>());
 static ns3::GlobalValue g_outageThreshold("outageTh", "Outage threshold",
     ns3::DoubleValue(-5), ns3::MakeDoubleChecker<double>());
 static ns3::GlobalValue g_lteUplink("lteUplink", "If true, always use LTE for uplink signalling",
@@ -264,8 +264,8 @@ main (int argc, char *argv[])
   GlobalValue::GetValueByName("mmeLatency", doubleValue);
   double mmeLatency = doubleValue.Get();
 
-  double transientDuration = double(vectorTransient)/1000000; 
-  double simTime = 1;//710;
+  double transientDuration = double(vectorTransient)/1000000;
+  double simTime = 58;//ms 0.005;//630;
 
   NS_LOG_UNCOND("fastSwitching " << fastSwitching << " rlcAmEnabled " << rlcAmEnabled << " bufferSize " << bufferSize << " interPacketInterval " << 
       interPacketInterval << " x2Latency " << x2Latency << " mmeLatency " << mmeLatency);
@@ -358,10 +358,10 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::MmWaveBearerStatsConnector::CellIdStatsHandoverOutputFilename", StringValue(path + version + cellIdInTimeHandoverOutName + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
   Config::SetDefault ("ns3::MmWaveBearerStatsConnector::MmWaveSinrOutputFilename", StringValue(path + version + mmWaveSinrOutputFilename + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
   Config::SetDefault ("ns3::CoreNetworkStatsCalculator::X2FileName", StringValue                  (path + version + x2statOutputFilename    + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  //std::string lostFilename = path + version + "LostUdpPackets" +  "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension;
-  //Config::SetDefault ("ns3::UdpServer::ReceivedPacketsFilename", StringValue(path + version + "ReceivedUdp" +  "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  //Config::SetDefault ("ns3::UdpClient::SentPacketsFilename", StringValue(path + version + "SentUdp" +  "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  //Config::SetDefault ("ns3::UdpServer::ReceivedSnFilename", StringValue(path + version + "ReceivedSn" +  "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
+  //  std::string lostFilename = path + version + "LostUdpPackets" +  "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension;
+  //  Config::SetDefault ("ns3::UdpServer::ReceivedPacketsFilename", StringValue(path + version + "ReceivedUdp" +  "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
+  //  Config::SetDefault ("ns3::UdpClient::SentPacketsFilename", StringValue(path + version + "SentUdp" +  "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
+  //  Config::SetDefault ("ns3::UdpServer::ReceivedSnFilename", StringValue(path + version + "ReceivedSn" +  "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
   Config::SetDefault ("ns3::LteRlcAm::BufferSizeFilename", StringValue(path + version + "RlcAmBufferSize" +  "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
 
   Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (bufferSize * 1024 * 1024));
@@ -608,10 +608,11 @@ main (int argc, char *argv[])
 
   BuildingsHelper::MakeMobilityModelConsistent ();
 
+/*
   Ptr<LteHelper> lteHelper = CreateObject<LteHelper>();
   lteHelper->EnablePdcpTraces();
   lteHelper->EnableRlcTraces();
-
+*/
   mmwaveHelper->EnableTraces ();
 
   // set to true if you want to print the map of buildings, ues and enbs
