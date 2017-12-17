@@ -625,7 +625,7 @@ main (int argc, char *argv[])
   }
   else
   {
-    AnimationInterface anim ("animation.xml");
+    //AnimationInterface anim ("animation.xml");
     Simulator::Stop(Seconds(simTime));
     Simulator::Run();    
   }
