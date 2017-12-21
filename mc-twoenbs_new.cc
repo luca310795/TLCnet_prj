@@ -185,8 +185,8 @@ static ns3::GlobalValue g_fastSwitching("fastSwitching", "If true, use mc setup,
     ns3::BooleanValue(true), ns3::MakeBooleanChecker());
 static ns3::GlobalValue g_rlcAmEnabled("rlcAmEnabled", "If true, use RLC AM, else use RLC UM",
     ns3::BooleanValue(true), ns3::MakeBooleanChecker());
-//static ns3::GlobalValue g_runNumber ("runNumber", "Run number for rng",
-    //ns3::UintegerValue(10), ns3::MakeUintegerChecker<uint32_t>());
+static ns3::GlobalValue g_runNumber ("runNumber", "Run number for rng",
+    ns3::UintegerValue(10), ns3::MakeUintegerChecker<uint32_t>());
 static ns3::GlobalValue g_outPath("outPath",
     "The path of output log files",
     ns3::StringValue("./"), ns3::MakeStringChecker());
@@ -265,13 +265,13 @@ main (int argc, char *argv[])
   double mmeLatency = doubleValue.Get();
 
   double transientDuration = double(vectorTransient)/1000000;
-  double simTime = 58;//ms 0.005;//630;
+  double simTime = 60;//ms 0.005;//630;
 
   NS_LOG_UNCOND("fastSwitching " << fastSwitching << " rlcAmEnabled " << rlcAmEnabled << " bufferSize " << bufferSize << " interPacketInterval " << 
       interPacketInterval << " x2Latency " << x2Latency << " mmeLatency " << mmeLatency);
 
   // rng things
-/*
+
   GlobalValue::GetValueByName("runNumber", uintegerValue);
   uint32_t runSet = uintegerValue.Get();
   uint32_t seedSet = 5;
@@ -281,7 +281,6 @@ main (int argc, char *argv[])
   char runSetStr[21];
   sprintf(seedSetStr, "%d", seedSet);
   sprintf(runSetStr, "%d", runSet);
-*/
 
   GlobalValue::GetValueByName("outPath", stringValue);
   std::string path = stringValue.Get();
@@ -344,32 +343,32 @@ main (int argc, char *argv[])
   Config::SetDefault ("ns3::MmWavePointToPointEpcHelper::X2LinkMtu",  UintegerValue(10000));
   Config::SetDefault ("ns3::MmWavePointToPointEpcHelper::S1uLinkDelay", TimeValue (MicroSeconds(1000)));
   Config::SetDefault ("ns3::MmWavePointToPointEpcHelper::S1apLinkDelay", TimeValue (MicroSeconds(mmeLatency)));
-  Config::SetDefault ("ns3::McStatsCalculator::MmWaveOutputFilename", StringValue                 (path + version + mmWaveOutName + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  Config::SetDefault ("ns3::McStatsCalculator::LteOutputFilename", StringValue                    (path + version + lteOutName    + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  Config::SetDefault ("ns3::McStatsCalculator::CellIdInTimeOutputFilename", StringValue           (path + version + cellIdInTimeOutName    + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  Config::SetDefault ("ns3::MmWaveBearerStatsCalculator::DlRlcOutputFilename", StringValue        (path + version + dlRlcOutName   + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  Config::SetDefault ("ns3::MmWaveBearerStatsCalculator::UlRlcOutputFilename", StringValue        (path + version + ulRlcOutName   + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  Config::SetDefault ("ns3::MmWaveBearerStatsCalculator::DlPdcpOutputFilename", StringValue       (path + version + dlPdcpOutName + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  Config::SetDefault ("ns3::MmWaveBearerStatsCalculator::UlPdcpOutputFilename", StringValue       (path + version + ulPdcpOutName + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  Config::SetDefault ("ns3::MmWaveBearerStatsConnector::UeHandoverStartOutputFilename", StringValue    (path + version +  ueHandoverStartOutName + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  Config::SetDefault ("ns3::MmWaveBearerStatsConnector::EnbHandoverStartOutputFilename", StringValue   (path + version + enbHandoverStartOutName + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  Config::SetDefault ("ns3::MmWaveBearerStatsConnector::UeHandoverEndOutputFilename", StringValue    (path + version +  ueHandoverEndOutName + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  Config::SetDefault ("ns3::MmWaveBearerStatsConnector::EnbHandoverEndOutputFilename", StringValue   (path + version + enbHandoverEndOutName + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  Config::SetDefault ("ns3::MmWaveBearerStatsConnector::CellIdStatsHandoverOutputFilename", StringValue(path + version + cellIdInTimeHandoverOutName + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  Config::SetDefault ("ns3::MmWaveBearerStatsConnector::MmWaveSinrOutputFilename", StringValue(path + version + mmWaveSinrOutputFilename + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  Config::SetDefault ("ns3::CoreNetworkStatsCalculator::X2FileName", StringValue                  (path + version + x2statOutputFilename    + "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  //  std::string lostFilename = path + version + "LostUdpPackets" +  "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension;
-  //  Config::SetDefault ("ns3::UdpServer::ReceivedPacketsFilename", StringValue(path + version + "ReceivedUdp" +  "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  //  Config::SetDefault ("ns3::UdpClient::SentPacketsFilename", StringValue(path + version + "SentUdp" +  "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  //  Config::SetDefault ("ns3::UdpServer::ReceivedSnFilename", StringValue(path + version + "ReceivedSn" +  "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
-  Config::SetDefault ("ns3::LteRlcAm::BufferSizeFilename", StringValue(path + version + "RlcAmBufferSize" +  "_" /*+ seedSetStr + "_" + runSetStr + "_"*/ + time_str + extension));
+  Config::SetDefault ("ns3::McStatsCalculator::MmWaveOutputFilename", StringValue                 (path + version + mmWaveOutName + "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  Config::SetDefault ("ns3::McStatsCalculator::LteOutputFilename", StringValue                    (path + version + lteOutName    + "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  Config::SetDefault ("ns3::McStatsCalculator::CellIdInTimeOutputFilename", StringValue           (path + version + cellIdInTimeOutName    + "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  Config::SetDefault ("ns3::MmWaveBearerStatsCalculator::DlRlcOutputFilename", StringValue        (path + version + dlRlcOutName   + "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  Config::SetDefault ("ns3::MmWaveBearerStatsCalculator::UlRlcOutputFilename", StringValue        (path + version + ulRlcOutName   + "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  Config::SetDefault ("ns3::MmWaveBearerStatsCalculator::DlPdcpOutputFilename", StringValue       (path + version + dlPdcpOutName + "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  Config::SetDefault ("ns3::MmWaveBearerStatsCalculator::UlPdcpOutputFilename", StringValue       (path + version + ulPdcpOutName + "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  Config::SetDefault ("ns3::MmWaveBearerStatsConnector::UeHandoverStartOutputFilename", StringValue    (path + version +  ueHandoverStartOutName + "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  Config::SetDefault ("ns3::MmWaveBearerStatsConnector::EnbHandoverStartOutputFilename", StringValue   (path + version + enbHandoverStartOutName + "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  Config::SetDefault ("ns3::MmWaveBearerStatsConnector::UeHandoverEndOutputFilename", StringValue    (path + version +  ueHandoverEndOutName + "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  Config::SetDefault ("ns3::MmWaveBearerStatsConnector::EnbHandoverEndOutputFilename", StringValue   (path + version + enbHandoverEndOutName + "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  Config::SetDefault ("ns3::MmWaveBearerStatsConnector::CellIdStatsHandoverOutputFilename", StringValue(path + version + cellIdInTimeHandoverOutName + "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  Config::SetDefault ("ns3::MmWaveBearerStatsConnector::MmWaveSinrOutputFilename", StringValue(path + version + mmWaveSinrOutputFilename + "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  Config::SetDefault ("ns3::CoreNetworkStatsCalculator::X2FileName", StringValue                  (path + version + x2statOutputFilename    + "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  //  std::string lostFilename = path + version + "LostUdpPackets" +  "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension;
+  //  Config::SetDefault ("ns3::UdpServer::ReceivedPacketsFilename", StringValue(path + version + "ReceivedUdp" +  "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  //  Config::SetDefault ("ns3::UdpClient::SentPacketsFilename", StringValue(path + version + "SentUdp" +  "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  //  Config::SetDefault ("ns3::UdpServer::ReceivedSnFilename", StringValue(path + version + "ReceivedSn" +  "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
+  Config::SetDefault ("ns3::LteRlcAm::BufferSizeFilename", StringValue(path + version + "RlcAmBufferSize" +  "_" + seedSetStr + "_" + runSetStr + "_" + time_str + extension));
 
   Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (bufferSize * 1024 * 1024));
   Config::SetDefault ("ns3::LteRlcUmLowLat::MaxTxBufferSize", UintegerValue (bufferSize * 1024 * 1024));
   Config::SetDefault ("ns3::LteRlcAm::StatusProhibitTimer", TimeValue(MilliSeconds(10.0)));
   Config::SetDefault ("ns3::LteRlcAm::MaxTxBufferSize", UintegerValue (bufferSize * 1024 * 1024));
 
-   // handover and RT related params
+  // handover and RT related params
   switch(hoMode)
   {
     case 1:
@@ -479,16 +478,35 @@ main (int argc, char *argv[])
   remoteHostStaticRouting->AddNetworkRouteTo (Ipv4Address ("7.0.0.0"), Ipv4Mask ("255.0.0.0"), 1);
 
   // Positions
-  Vector mmw1Position = Vector(25, 38, 3);
-  Vector mmw2Position = Vector(75, 38, 3);
-  Vector mmw3Position = Vector(62, 10, 3);
+  Vector mmw1Position = Vector(50, 88, 3);
+  Vector mmw2Position = Vector(150, 88, 3);
+  Vector mmw3Position = Vector(112, 20, 3);
 
   // Buildings
-  Ptr<Building> buildingL = CreateObject<Building> ();
-  buildingL->SetBoundaries (Box (6, 36, 6, 36, 1.6, 40)); // 14 m from the street
+  Ptr<Building> buildingLeft = CreateObject<Building> ();
+  buildingLeft->SetBoundaries (Box (6, 86, 6, 86, 1.6, 40)); // 14 m from the street
   
-  Ptr<Building> buildingR = CreateObject<Building> ();
-  buildingR->SetBoundaries (Box (64, 94, 6, 36, 1.6, 40));
+  Ptr<Building> buildingRight = CreateObject<Building> ();
+  buildingRight->SetBoundaries (Box (114, 194, 6, 86, 1.6, 40));
+
+  uint32_t treeSize = 3;
+  uint32_t treeSpacing = 7;
+  uint32_t nTrees = 7;
+
+  for (uint32_t t = 0; t < nTrees; t++)
+  {
+    Ptr<Building> treeLeft = CreateObject<Building> ();
+    treeLeft->SetBoundaries (Box (86 - (t+1)*treeSize - t*treeSpacing, 86 - t*(treeSize + treeSpacing), 90, 90 + treeSize, 0, 6));
+
+    Ptr<Building> treeRight = CreateObject<Building> ();
+    treeRight->SetBoundaries (Box (114 + (t+1)*treeSize + t*treeSpacing, 114 + t*(treeSize + treeSpacing), 90, 90 + treeSize, 0, 6));
+
+    Ptr<Building> treeDownLeft = CreateObject<Building> ();
+    treeDownLeft->SetBoundaries (Box (90, 90 + treeSize, 86 - (t+1)*treeSize - t*treeSpacing, 86 - t*(treeSize + treeSpacing), 0, 6));
+
+    Ptr<Building> treeDownRight = CreateObject<Building> ();
+    treeDownRight->SetBoundaries (Box (110 - treeSize, 110, 86 - (t+1)*treeSize - t*treeSpacing, 86 - t*(treeSize + treeSpacing), 0, 6));
+  }
 
   //Install Mobility Model
   Ptr<ListPositionAllocator> enbPositionAlloc = CreateObject<ListPositionAllocator> ();
@@ -502,7 +520,6 @@ main (int argc, char *argv[])
   enbmobility.SetPositionAllocator(enbPositionAlloc);
   enbmobility.Install (allEnbNodes);
   BuildingsHelper::Install (allEnbNodes);
-
 
   //    ueNodes.Get (0)->GetObject<MobilityModel> ()->SetPosition (Vector (ueInitialPosition, -5, 0));
 
@@ -608,11 +625,10 @@ main (int argc, char *argv[])
 
   BuildingsHelper::MakeMobilityModelConsistent ();
 
-/*
   Ptr<LteHelper> lteHelper = CreateObject<LteHelper>();
   lteHelper->EnablePdcpTraces();
   lteHelper->EnableRlcTraces();
-*/
+
   mmwaveHelper->EnableTraces ();
 
   // set to true if you want to print the map of buildings, ues and enbs
@@ -625,7 +641,7 @@ main (int argc, char *argv[])
   }
   else
   {
-    //AnimationInterface anim ("animation.xml");
+    AnimationInterface anim ("animation.xml");
     Simulator::Stop(Seconds(simTime));
     Simulator::Run();    
   }
