@@ -205,6 +205,8 @@ static ns3::GlobalValue g_lteUplink("lteUplink", "If true, always use LTE for up
 int
 main (int argc, char *argv[])
 {
+  //LogComponentEnable ("LteEnbRrc", LOG_LEVEL_ALL);
+
   bool harqEnabled = true;
   bool fixedTti = false;
   unsigned symPerSf = 24;
@@ -265,7 +267,7 @@ main (int argc, char *argv[])
   double mmeLatency = doubleValue.Get();
 
   double transientDuration = double(vectorTransient)/1000000;
-  double simTime = 60;//ms 0.005;//630;
+  double simTime = 60.0;//60;//ms 0.005;//630;
 
   NS_LOG_UNCOND("fastSwitching " << fastSwitching << " rlcAmEnabled " << rlcAmEnabled << " bufferSize " << bufferSize << " interPacketInterval " << 
       interPacketInterval << " x2Latency " << x2Latency << " mmeLatency " << mmeLatency);
@@ -478,16 +480,16 @@ main (int argc, char *argv[])
   remoteHostStaticRouting->AddNetworkRouteTo (Ipv4Address ("7.0.0.0"), Ipv4Mask ("255.0.0.0"), 1);
 
   // Positions
-  Vector mmw1Position = Vector(50, 88, 3);
-  Vector mmw2Position = Vector(150, 88, 3);
-  Vector mmw3Position = Vector(112, 20, 3);
+  Vector mmw1Position = Vector(80, 88, 3);
+  Vector mmw2Position = Vector(120, 88, 3);
+  Vector mmw3Position = Vector(112, 40, 3);
 
   // Buildings
   Ptr<Building> buildingLeft = CreateObject<Building> ();
-  buildingLeft->SetBoundaries (Box (6, 86, 6, 86, 1.6, 40)); // 14 m from the street
+  buildingLeft->SetBoundaries (Box (6, 86, 6, 86, 0, 40)); // 14 m from the street
   
   Ptr<Building> buildingRight = CreateObject<Building> ();
-  buildingRight->SetBoundaries (Box (114, 194, 6, 86, 1.6, 40));
+  buildingRight->SetBoundaries (Box (114, 194, 6, 86, 0, 40));
 
   uint32_t treeSize = 3;
   uint32_t treeSpacing = 7;
