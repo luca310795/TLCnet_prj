@@ -205,7 +205,7 @@ static ns3::GlobalValue g_lteUplink("lteUplink", "If true, always use LTE for up
 int
 main (int argc, char *argv[])
 {
-  //LogComponentEnable ("LteEnbRrc", LOG_LEVEL_ALL);
+  LogComponentEnable ("LteEnbRrc", LOG_LEVEL_ALL);
 
   bool harqEnabled = true;
   bool fixedTti = false;
@@ -437,7 +437,7 @@ main (int argc, char *argv[])
   NodeContainer lteEnbNodes;
   NodeContainer allEnbNodes;
 
-  mmWaveEnbNodes.Create(3);
+  mmWaveEnbNodes.Create(4);
   lteEnbNodes.Create(1);
   
   allEnbNodes.Add(lteEnbNodes);
@@ -483,6 +483,7 @@ main (int argc, char *argv[])
   Vector mmw1Position = Vector(80, 88, 3);
   Vector mmw2Position = Vector(120, 88, 3);
   Vector mmw3Position = Vector(112, 40, 3);
+  Vector mmw4Position = Vector(5000, -5000, 3);
 
   // Buildings
   Ptr<Building> buildingLeft = CreateObject<Building> ();
@@ -517,6 +518,7 @@ main (int argc, char *argv[])
   enbPositionAlloc->Add (mmw1Position);
   enbPositionAlloc->Add (mmw2Position);
   enbPositionAlloc->Add (mmw3Position);
+  enbPositionAlloc->Add (mmw4Position);
   MobilityHelper enbmobility;
   enbmobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   enbmobility.SetPositionAllocator(enbPositionAlloc);
