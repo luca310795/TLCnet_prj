@@ -270,6 +270,75 @@ MmWaveBearerStatsCalculator::DlRxPdu (uint16_t cellId, uint64_t imsi, uint16_t r
   // 	m_dlOutFile << "P ";
   // }
 
+
+  // Stampa cellId 5 se i pck provengono da enb5
+  switch (imsi)
+  {
+    case 4:
+      if (Simulator::Now().GetMilliSeconds() >= 15000)
+        cellId = 5;
+      break;
+
+    case 3:
+      if (Simulator::Now().GetMilliSeconds() >= 16400)
+        cellId = 5;
+      break;
+
+    case 12:
+      if (Simulator::Now().GetMilliSeconds() >= 17800)
+        cellId = 5;
+      break;
+
+    case 11:
+      if (Simulator::Now().GetMilliSeconds() >= 19200)
+        cellId = 5;
+      break;
+
+    case 10:
+      if (Simulator::Now().GetMilliSeconds() >= 20500)
+        cellId = 5;
+      break;
+
+    case 9:
+      if (Simulator::Now().GetMilliSeconds() >= 21900)
+        cellId = 5;
+      break;
+
+    case 8:
+      if (Simulator::Now().GetMilliSeconds() >= 15100)
+        cellId = 5;
+      break;
+
+    case 7:
+      if (Simulator::Now().GetMilliSeconds() >= 56000)
+        cellId = 5;
+      break;
+
+    case 6:
+      if (Simulator::Now().GetMilliSeconds() >= 57300)
+        cellId = 5;
+      break;
+
+    case 5:
+      if (Simulator::Now().GetMilliSeconds() >= 58000)
+        cellId = 5;
+      break;
+
+    case 2:
+      if (Simulator::Now().GetMilliSeconds() >= 59400)
+        cellId = 5;
+      break;
+
+    case 1:
+      if (Simulator::Now().GetMilliSeconds() >= 60700)
+        cellId = 5;
+      break;
+
+    default:
+      break;
+  }
+
+
   m_dlOutFile << "Rx " << Simulator::Now ().GetNanoSeconds () / 1.0e9 << " " << cellId << " " << imsi << " " //!!!!
   		<< rnti << " " << (uint32_t) lcid << " " << packetSize << " " << delay << std::endl;
 
