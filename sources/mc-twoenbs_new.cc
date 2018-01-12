@@ -483,7 +483,7 @@ main (int argc, char *argv[])
   Vector mmw1Position = Vector(80, 88, 3);
   Vector mmw2Position = Vector(120, 88, 3);
   Vector mmw3Position = Vector(112, 40, 3);
-  Vector mmw4Position = Vector(5000, -5000, 3);
+  Vector mmw4Position = Vector(200, 88, 3);
 
   // Buildings
   Ptr<Building> buildingLeft = CreateObject<Building> ();

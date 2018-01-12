@@ -3536,6 +3536,13 @@ LteEnbRrc::TriggerUeAssociationUpdate()
       for(CellSinrMap::iterator cellIter = imsiIter->second.begin(); cellIter != imsiIter->second.end(); ++cellIter)
       {
         NS_LOG_INFO("Cell " << cellIter->first << " reports " << 10*std::log10(cellIter->second));
+
+
+        // Evitare connessione a enb5
+        if (cellIter->first == 5)
+          cellIter->second = 0;
+
+
         if(cellIter->second > maxSinr)
         {
           maxSinr = cellIter->second;
@@ -3546,7 +3553,6 @@ LteEnbRrc::TriggerUeAssociationUpdate()
           currentSinr = cellIter->second;
         }
       }
-
 
 
       // Handover normale
