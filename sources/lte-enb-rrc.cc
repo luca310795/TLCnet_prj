@@ -3501,6 +3501,37 @@ LteEnbRrc::ThresholdBasedSecondaryCellHandover(std::map<uint64_t, CellSinrMap>::
   }
 }
 
+
+#include <iostream>
+#include <fstream>
+
+const bool NEW_HANDOVER = true; // impostare a true per adottare la nuova politica di handover
+const std::string LOG_FILE = "/home/luca/Scrivania/NEW_HANDOVER_stats"; // file di log
+
+const uint64_t LOG_PERIOD_MILLIS = 250;
+uint8_t enbUeTable[3][12]; // tabella delle connessioni enb ue: enbUeTable[i][j] = 1 se ue i connesso a enb j
+std::ofstream logStream; // flusso di log
+bool logging = true;
+
+void
+enableLogging()
+{
+  logging = true;
+}
+
+// Ritorna il numero di ue connessi a enb
+uint8_t
+getUeCount(uint8_t enb)
+{
+  uint8_t count = 0;
+  for (uint8_t j = 0; j < 12; j++)
+  {
+    count += enbUeTable[enb - 2][j];
+  }
+  return count;
+}
+
+
 void 
 LteEnbRrc::TriggerUeAssociationUpdate()
 {
@@ -3554,8 +3585,83 @@ LteEnbRrc::TriggerUeAssociationUpdate()
         }
       }
 
+      if (NEW_HANDOVER)
+      {
 
-      // Handover normale
+      // Logging
+      if (logging)
+      {
+       logStream.open(LOG_FILE, std::ios::app);
+       logStream << "Time: " << (Simulator::Now().GetNanoSeconds() / 1.0e9) << "\n";
+
+       logStream << "Ue count enb 2: " << std::to_string(getUeCount(2)) << "\n";
+       logStream << "Ue count enb 3: " << std::to_string(getUeCount(3)) << "\n";
+       logStream << "Ue count enb 4: " << std::to_string(getUeCount(4)) << "\n";
+      }
+      // Imsi cambia enb: elimino la connessione attuale dalla tabella
+      for (uint8_t i = 0; i < 3; i++)
+      {
+    	if (enbUeTable[i][imsi - 1] == 1)
+    	{
+    	  enbUeTable[i][imsi - 1] = 0;
+    	  if (logging)
+    	  {
+    	   logStream << "Ue " << imsi << " si 'disconnette' da enb " << std::to_string(i + 2) << "\n";
+    	   logStream << "Ue count enb " << std::to_string(i + 2) << ": " << std::to_string(getUeCount(i + 2)) << "\n";
+    	  }
+    	}
+      }
+
+      // Politica di scelta della enb
+      if (logging)
+        logStream << "Ue " << imsi << " si connetterebbe a enb " << std::to_string(maxSinrCellId) << "\n";
+
+      // Numero utenti connessi alla enb con max SINR
+      uint8_t maxSinrCellUeCount = getUeCount(maxSinrCellId);
+      uint64_t currBestSinr = maxSinr;
+
+      // Calcolo la media dei sinr
+      uint64_t sinrThreshold = 0;
+      for(CellSinrMap::iterator cellIter = imsiIter->second.begin(); cellIter != imsiIter->second.end(); ++cellIter)
+      {
+        // Evitare enb5 ed enb0
+      	if (cellIter->first == 5 || cellIter->first == 0)
+          continue;
+      	sinrThreshold += cellIter->second;
+      }
+      sinrThreshold /= 3;
+      if (logging)
+        logStream << "SINR Threshold = " << std::to_string(sinrThreshold) << "\n";
+
+      for(CellSinrMap::iterator cellIter = imsiIter->second.begin(); cellIter != imsiIter->second.end(); ++cellIter)
+	  {
+    	// Evitare enb5 ed enb0
+		if (cellIter->first == 5 || cellIter->first == 0)
+		   continue;
+
+		if (logging)
+          logStream << "Enb " <<  cellIter->first << ": SINR = " << std::to_string(cellIter->second) << " Ue count = " << std::to_string(getUeCount(cellIter->first)) << "\n";
+
+        // Controllo se enb è candidata per l'handover
+        if ((currBestSinr - cellIter->second) <= sinrThreshold)
+        {
+          // Se la enb candidata ha meno ue o stessi ue ma miglior SINR, connettiti
+          if ((getUeCount(cellIter->first) < maxSinrCellUeCount) || ((getUeCount(cellIter->first) == maxSinrCellUeCount) && (cellIter->second > maxSinr)))
+          {
+            maxSinr = cellIter->second;
+        	maxSinrCellId = cellIter->first;
+        	maxSinrCellUeCount = getUeCount(cellIter->first);
+        	if(m_lastMmWaveCell[imsi] == cellIter->first)
+        	{
+        	  currentSinr = cellIter->second;
+        	}
+          }
+        }
+	  }
+
+      }
+
+      // Connetto a enb 5 quando gli ue sono giunti a destinazione
       switch (imsi)
       {
         case 4:
@@ -3621,125 +3727,22 @@ LteEnbRrc::TriggerUeAssociationUpdate()
 	    default:
 	      break;
       }
-      
 
-      // Handover modificato
-      /*
-      switch (imsi)
+      if (NEW_HANDOVER)
       {
-        case 4:
-          if (Simulator::Now().GetMilliSeconds() < 7500)
-            maxSinrCellId = 4;
-          else if (Simulator::Now().GetMilliSeconds() < 15000)
-        	maxSinrCellId = 3;
-          else
-            maxSinrCellId = 5;
-          break;
 
-        case 3:
-          if (Simulator::Now().GetMilliSeconds() < 9500)
-            maxSinrCellId = 4;
-          else if (Simulator::Now().GetMilliSeconds() < 16400)
-        	maxSinrCellId = 3;
-          else
-            maxSinrCellId = 5;
-          break;
+      // Aggiorno la tabella delle connessioni (se la enb in questione non è la 5)
+      if (enbUeTable[maxSinrCellId - 2][imsi - 1] != 3)
+        enbUeTable[maxSinrCellId - 2][imsi - 1] = 1;
 
-        case 12:
-          if (Simulator::Now().GetMilliSeconds() < 11500)
-            maxSinrCellId = 4;
-          else if (Simulator::Now().GetMilliSeconds() < 17800)
-        	maxSinrCellId = 3;
-          else
-            maxSinrCellId = 5;
-          break;
-
-        case 11:
-          if (Simulator::Now().GetMilliSeconds() < 12500)
-            maxSinrCellId = 4;
-          else if (Simulator::Now().GetMilliSeconds() < 19200)
-        	maxSinrCellId = 3;
-          else
-            maxSinrCellId = 5;
-          break;
-
-        case 10:
-          if (Simulator::Now().GetMilliSeconds() < 14500)
-            maxSinrCellId = 4;
-          else if (Simulator::Now().GetMilliSeconds() < 20500)
-        	maxSinrCellId = 3;
-          else
-            maxSinrCellId = 5;
-          break;
-
-        case 9:
-          if (Simulator::Now().GetMilliSeconds() < 16000)
-            maxSinrCellId = 4;
-          else if (Simulator::Now().GetMilliSeconds() < 21900)
-        	maxSinrCellId = 3;
-          else
-            maxSinrCellId = 5;
-          break;
-
-        case 8:
-          if (Simulator::Now().GetMilliSeconds() < 8000)
-            maxSinrCellId = 2;
-          else if (Simulator::Now().GetMilliSeconds() < 15100)
-        	maxSinrCellId = 4;
-          else
-            maxSinrCellId = 5;
-          break;
-
-        case 7:
-          if (Simulator::Now().GetMilliSeconds() < 24000)
-            maxSinrCellId = 2;
-          else if (Simulator::Now().GetMilliSeconds() < 56000)
-        	maxSinrCellId = 3;
-          else
-            maxSinrCellId = 5;
-          break;
-
-        case 6:
-          if (Simulator::Now().GetMilliSeconds() < 24000)
-            maxSinrCellId = 2;
-          else if (Simulator::Now().GetMilliSeconds() < 57300)
-        	maxSinrCellId = 3;
-          else
-            maxSinrCellId = 5;
-          break;
-
-        case 5:
-          if (Simulator::Now().GetMilliSeconds() < 52000)
-            maxSinrCellId = 2;
-          else if (Simulator::Now().GetMilliSeconds() < 58000)
-        	maxSinrCellId = 4;
-          else
-            maxSinrCellId = 5;
-          break;
-
-        case 2:
-          if (Simulator::Now().GetMilliSeconds() < 54000)
-            maxSinrCellId = 2;
-          else if (Simulator::Now().GetMilliSeconds() < 59400)
-        	maxSinrCellId = 3;
-          else
-            maxSinrCellId = 5;
-          break;
-
-        case 1:
-          if (Simulator::Now().GetMilliSeconds() < 56000)
-            maxSinrCellId = 2;
-          else if (Simulator::Now().GetMilliSeconds() < 60700)
-        	maxSinrCellId = 3;
-          else
-            maxSinrCellId = 5;
-          break;
-
-	    default:
-	      break;
+      if (logging)
+      {
+        logStream << "Ue " << imsi << " si connette invece a enb " << std::to_string(maxSinrCellId) << "\n\n";
+        // Chiudo il file di logging
+        logStream.close();
       }
-      */
 
+      }
 
       long double sinrDifference = std::abs(10*(std::log10((long double)maxSinr) - std::log10((long double)currentSinr)));
       long double maxSinrDb = 10*std::log10((long double)maxSinr);
@@ -3797,6 +3800,15 @@ LteEnbRrc::TriggerUeAssociationUpdate()
     }
   }
   
+  // Disabilito logging
+  if (NEW_HANDOVER)
+  {
+    if (logging)
+      Simulator::Schedule(MilliSeconds(LOG_PERIOD_MILLIS), &enableLogging);
+    logging = false;
+  }
+
+
   Simulator::Schedule(MicroSeconds(m_crtPeriod), &LteEnbRrc::TriggerUeAssociationUpdate, this);
 }
 

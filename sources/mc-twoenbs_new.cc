@@ -205,7 +205,7 @@ static ns3::GlobalValue g_lteUplink("lteUplink", "If true, always use LTE for up
 int
 main (int argc, char *argv[])
 {
-  LogComponentEnable ("LteEnbRrc", LOG_LEVEL_ALL);
+  //LogComponentEnable ("LteEnbRrc", LOG_LEVEL_ERROR);
 
   bool harqEnabled = true;
   bool fixedTti = false;
