@@ -3629,7 +3629,7 @@ LteEnbRrc::TriggerUeAssociationUpdate()
           continue;
       	sinrThreshold += cellIter->second;
       }
-      sinrThreshold /= 3;
+      sinrThreshold = 100;///= 3;
       if (logging)
         logStream << "SINR Threshold = " << std::to_string(sinrThreshold) << "\n";
 
