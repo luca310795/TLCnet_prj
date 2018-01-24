@@ -3505,7 +3505,7 @@ LteEnbRrc::ThresholdBasedSecondaryCellHandover(std::map<uint64_t, CellSinrMap>::
 #include <iostream>
 #include <fstream>
 
-const bool NEW_HANDOVER = true; // impostare a true per adottare la nuova politica di handover
+const bool NEW_HANDOVER = false; // impostare a true per adottare la nuova politica di handover
 const std::string LOG_FILE = "/home/luca/Scrivania/NEW_HANDOVER_stats"; // file di log
 
 const uint64_t LOG_PERIOD_MILLIS = 250;
@@ -3629,7 +3629,8 @@ LteEnbRrc::TriggerUeAssociationUpdate()
           continue;
       	sinrThreshold += cellIter->second;
       }
-      sinrThreshold = 100;///= 3;
+      sinrThreshold /= 3;// 100;///= 3;
+
       if (logging)
         logStream << "SINR Threshold = " << std::to_string(sinrThreshold) << "\n";
 

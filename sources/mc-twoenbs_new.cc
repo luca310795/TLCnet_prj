@@ -174,7 +174,7 @@ PrintLostUdpPackets(Ptr<UdpServer> app, std::string fileName)
 }
 
 static ns3::GlobalValue g_interPckInterval("interPckInterval", "Interarrival time of UDP packets (us)",
-    ns3::UintegerValue(20), ns3::MakeUintegerChecker<uint32_t>());
+    ns3::UintegerValue(1), ns3::MakeUintegerChecker<uint32_t>());
 static ns3::GlobalValue g_bufferSize("bufferSize", "RLC tx buffer size (MB)",
     ns3::UintegerValue(20), ns3::MakeUintegerChecker<uint32_t>());
 static ns3::GlobalValue g_x2Latency("x2Latency", "Latency on X2 interface (us)",
@@ -267,7 +267,7 @@ main (int argc, char *argv[])
   double mmeLatency = doubleValue.Get();
 
   double transientDuration = double(vectorTransient)/1000000;
-  double simTime = 60.0;//60;//ms 0.005;//630;
+  double simTime = 60;//30.0;//60;//ms 0.005;//630;
 
   NS_LOG_UNCOND("fastSwitching " << fastSwitching << " rlcAmEnabled " << rlcAmEnabled << " bufferSize " << bufferSize << " interPacketInterval " << 
       interPacketInterval << " x2Latency " << x2Latency << " mmeLatency " << mmeLatency);
@@ -612,7 +612,7 @@ main (int argc, char *argv[])
       }
   }
 
-  // Start applications
+  // Start applications.
   NS_LOG_UNCOND("transientDuration " << transientDuration << " simTime " << simTime);
   serverApps.Start (Seconds(transientDuration));
   clientApps.Start (Seconds(transientDuration));
@@ -629,9 +629,9 @@ main (int argc, char *argv[])
 
   BuildingsHelper::MakeMobilityModelConsistent ();
 
-  Ptr<LteHelper> lteHelper = CreateObject<LteHelper>();
-  lteHelper->EnablePdcpTraces();
-  lteHelper->EnableRlcTraces();
+//  Ptr<LteHelper> lteHelper = CreateObject<LteHelper>();
+//  lteHelper->EnablePdcpTraces();
+//  lteHelper->EnableRlcTraces();
 
   mmwaveHelper->EnableTraces ();
 
