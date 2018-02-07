@@ -1,0 +1,78 @@
+****SUMO****
+
+60 secondi
+Il semaforo cambia dopo circa 45 secondi
+12 utenti
+Velocità casuale da 0 a 13.8 m/s
+xrange[0:200] metri
+yrange[0:100] metri
+
+<routes>
+  <vType id="CarLR" length="4.0" minGap="1.5" />
+  <vType id="CarLD" length="4.0" minGap="1.5" />
+  <vType id="CarDR" length="4.0" minGap="1.5" />
+
+  <route id="routeLR" edges="LC CR"/>
+  <route id="routeLD" edges="LC CD"/>
+  <route id="routeDR" edges="DC CR"/>
+
+  <vehicle id="00" type="CarLR" route="routeLR" depart="0" departPos="6.0" color="1,0,0" />
+  <vehicle id="01" type="CarLR" route="routeLR" depart="0" departPos="12.0" color="1,0,0" />
+
+  <vehicle id="02" type="CarLD" route="routeLD" depart="0" departPos="18.0" color="0,1,0" />
+
+  <vehicle id="03" type="CarLR" route="routeLR" depart="0" departPos="24.0" color="1,0,0" />
+  <vehicle id="04" type="CarLR" route="routeLR" depart="0" departPos="30.0" color="1,0,0" />
+
+  <vehicle id="05" type="CarLD" route="routeLD" depart="0" departPos="36.0" color="0,1,0" />
+
+
+  <vehicle id="06" type="CarDR" route="routeDR" depart="0" departPos="6.0" color="0,0,1" />
+  <vehicle id="07" type="CarDR" route="routeDR" depart="0" departPos="12.0" color="0,0,1" />
+  <vehicle id="08" type="CarDR" route="routeDR" depart="0" departPos="18.0" color="0,0,1" />
+  <vehicle id="09" type="CarDR" route="routeDR" depart="0" departPos="24.0" color="0,0,1" />
+  <vehicle id="10" type="CarDR" route="routeDR" depart="0" departPos="30.0" color="0,0,1" />
+  <vehicle id="11" type="CarDR" route="routeDR" depart="0" departPos="36.0" color="0,0,1" />
+</routes>
+
+********
+
+
+
+****ns3****
+ReportTablePeriodicity = 25600 us: ogni quanto vengono registrati SINR
+Transiente iniziale = 1.28 s
+
+DHO: DYNAMIC_TTT
+
+mmw1Position = Vector(80, 88, 3);
+mmw2Position = Vector(120, 88, 3);
+mmw3Position = Vector(112, 40, 3);
+
+buildingLeft->(6, 86, 6, 86, 0, 25)); // 14 m dalla strada, 2 m dalla bs più vicina
+buildingRight->(114, 194, 6, 86, 0, 25));
+
+treeSize = 3 m // 2m dalle bs
+treeSpacing = 7 m
+nTrees = 7 m
+
+Ogni utente lancia un'applicazione che richiede:
+interPckInterval := "Interarrival time of UDP packets (us)" = 1us
+
+x2Latency = 500
+mmeLatency = 10000
+
+
+I pacchetti inviati dalle bs agli ue hanno dimensione 1054 byte
+
+Le bs hanno bitrate di 3 Gbit/s
+
+4 tipi di handover:
+DHO
+MHO100: soglia a 100
+MHOM: soglia che è la media dei tre sinr
+MHOS: soglia di Shannon
+
+5 tracce con runNumber diversi per ognuna delle 4 modalità
+
+********
